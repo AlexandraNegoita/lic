@@ -1,0 +1,31 @@
+{
+  "name": "lic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf ./build",
+    "build": "npm run clean && tsc",
+    "start": "node src",
+    "local": "tsx src",
+    "local:watch": "nodemon src -e ts,json --exec \"npm run local\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexandraNegoita/lic.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlexandraNegoita/lic/issues"
+  },
+  "homepage": "https://github.com/AlexandraNegoita/lic#readme",
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "nodemon": "^3.1.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^5.0.5",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  }
+}
