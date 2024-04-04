@@ -1,7 +1,8 @@
 import * as PIXI from "pixi.js";
 import { Board } from "./Board";
-import { Coordinates } from "./Coordinates";
+import { Model } from "../model/Model";
 export class Wall extends PIXI.Graphics {
+
     drawPosition: number[] = [0,0];
     lineTempWidth: number;
     lineTempColor: string;
@@ -30,15 +31,6 @@ export class Wall extends PIXI.Graphics {
         this.lineTo(newPos[0], newPos[1]);
         this.stroke({ width: this.lineTempWidth, color: this.lineTempColor });
     }
-
-    drawWall(board:Board, x: number, y: number) {
-        this.clear();
-        let newPos : number[] = this.snapToPoint(board, x, y);
-        //console.log(x, y, newPos[0], newPos[1], this.drawPosition[0], this.drawPosition[1]);
-        this.moveToPoint(board, this.drawPosition[0], this.drawPosition[1]);
-        this.lineTo(newPos[0], newPos[1]);
-        this.stroke({ width: this.lineTempWidth, color: this.lineTempColor });
-    }
     drawPermanentWall(board:Board, x: number, y: number) {
         this.clear();
         let newPos : number[] = this.snapToPoint(board, x, y);
@@ -64,4 +56,5 @@ export class Wall extends PIXI.Graphics {
         positions.push(y);
         return positions;
     }
+
 }

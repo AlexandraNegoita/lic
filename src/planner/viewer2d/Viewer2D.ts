@@ -1,10 +1,13 @@
 import * as PIXI from 'pixi.js';
 import { Wall } from './Wall';
 import { Board } from './Board';
+import { Model } from '../model/Model';
 
 export class Viewer2D extends PIXI.Application {
+    
     wall: Wall = new Wall();
     board: Board = new Board();
+    model: Model = new Model();
     backgroundLayer = new PIXI.Container();
     wallsLayer = new PIXI.Container();
     isMouseDown: boolean = false;
@@ -33,9 +36,6 @@ export class Viewer2D extends PIXI.Application {
             this.wall.drawTemporaryWall(this.board, e.data.global.x, e.data.global.y);
             console.log('Mouse clicked: ' + this.wall.drawPosition);
             this.isMouseDown = true;
-            
-
-            
         });
         this.stage.on('mousemove', (e) => {
             
@@ -48,6 +48,7 @@ export class Viewer2D extends PIXI.Application {
             console.log('Mouse released');
             this.isMouseDown = false;
             this.wall.drawPermanentWall(this.board, e.data.global.x, e.data.global.y);
+            this.model.addToWalls(this.wall.drawPosition[0], this.wall.drawPosition[1], e.data.global.x, e.data.global.y)
             // console.log('X', e.data.global.x, 'Y', e.data.global.y);
         });
         //this.ticker.add(delta=>this.update(delta));
@@ -59,7 +60,8 @@ export class Viewer2D extends PIXI.Application {
        
       
    // }
-    toJSON(){
 
+    toJSON(): string{
+        return this.model.toJSON();
     }
 }
