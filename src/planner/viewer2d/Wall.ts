@@ -9,7 +9,7 @@ export class Wall extends PIXI.Graphics {
     lineColor: string;
     constructor(lineSize?: number, lineColor?: string) {
         super();
-        this.lineTempWidth = 3;
+        this.lineTempWidth = 2;
         this.lineWidth = lineSize || 5;
         this.lineTempColor = "0xFF0000";
         this.lineColor = lineColor || "0x530000";
@@ -22,6 +22,7 @@ export class Wall extends PIXI.Graphics {
 		return super.lineTo(x, y);
 	}
     drawTemporaryWall(board: Board, x: number, y: number) {
+        this.clear();
         //const points = mouse_points.map((val, index) => val || this.points[index]);
         //this.points = points;
         this.moveToPoint(board, this.drawPosition[0], this.drawPosition[1]);
@@ -37,6 +38,14 @@ export class Wall extends PIXI.Graphics {
         this.moveToPoint(board, this.drawPosition[0], this.drawPosition[1]);
         this.lineTo(newPos[0], newPos[1]);
         this.stroke({ width: this.lineTempWidth, color: this.lineTempColor });
+    }
+    drawPermanentWall(board:Board, x: number, y: number) {
+        this.clear();
+        let newPos : number[] = this.snapToPoint(board, x, y);
+        //console.log(x, y, newPos[0], newPos[1], this.drawPosition[0], this.drawPosition[1]);
+        this.moveToPoint(board, this.drawPosition[0], this.drawPosition[1]);
+        this.lineTo(newPos[0], newPos[1]);
+        this.stroke({ width: this.lineWidth, color: this.lineColor });
     }
 
     snapToPoint(board:Board, x: number, y:number): number[] {

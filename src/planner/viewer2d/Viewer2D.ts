@@ -40,15 +40,15 @@ export class Viewer2D extends PIXI.Application {
         this.stage.on('mousemove', (e) => {
             
             if(this.isMouseDown) {
-                this.wall.drawWall(this.board, e.data.global.x, e.data.global.y);
+                this.wall.drawTemporaryWall(this.board, e.data.global.x, e.data.global.y);
                 console.log('Mouse moved' + this.wall.drawPosition);
             }
         });
         this.stage.on('mouseup', (e) => {
             console.log('Mouse released');
             this.isMouseDown = false;
-           // this.wall.lineTo(e.data.global.x, e.data.global.y);
-           // console.log('X', e.data.global.x, 'Y', e.data.global.y);
+            this.wall.drawPermanentWall(this.board, e.data.global.x, e.data.global.y);
+            // console.log('X', e.data.global.x, 'Y', e.data.global.y);
         });
         //this.ticker.add(delta=>this.update(delta));
         console.log(this.stage.children);
