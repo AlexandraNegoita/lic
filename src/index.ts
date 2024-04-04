@@ -1,14 +1,14 @@
-import http from 'http';
+import express from 'express';
+import dotenv from 'dotenv';
+import { routes } from './routes';
 
-export const server = http.createServer((req, res) => {
-    res.writeHead(200, {"Content-type" : "application/json"});
-    res.end(
-        JSON.stringify({
-            data: "It WORKS"
-        })
-    )
-})
+const app = express();
+dotenv.config();
 
-server.listen(3000, () => {
-    console.log("Server running on http://localhost:3000/");
-})
+// routes
+app.use('/', routes);
+
+// start the server
+app.listen(3000, () => {
+    console.log('The application is listening on port 3000!');
+});

@@ -1,0 +1,20 @@
+{
+  "name": "planner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fabric": "^5.3.0",
+    "pixi.js": "^8.0.4",
+    "pixijs": "^7.1.4"
+  },
+  "devDependencies": {
+    "@types/pixi.js": "^5.3.7"
+  }
+}
