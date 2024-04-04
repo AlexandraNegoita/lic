@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import { Board } from "./Board";
 import { Model } from "../model/Model";
 export class Wall extends PIXI.Graphics {
-
+    drawMode: string = 'wall';
     drawPosition: number[] = [0,0];
     lineTempWidth: number;
     lineTempColor: string;
@@ -22,6 +22,22 @@ export class Wall extends PIXI.Graphics {
     lineTo(x: number, y: number): this {
 		return super.lineTo(x, y);
 	}
+
+    drawTemporary(board: Board, x: number, y: number) {
+        if(this.drawMode == 'wall') {
+            this.drawTemporaryWall(board, x, y);
+        } else {
+            this.drawTemporaryRoom(board, x, y);
+        }
+    }
+    drawPermanent(board: Board, x: number, y: number) {
+        if(this.drawMode == 'wall') {
+            this.drawPermanentWall(board, x, y);
+        } else {
+            this.drawPermanentRoom(board, x, y);
+        }
+    }
+ 
     drawTemporaryWall(board: Board, x: number, y: number) {
         this.clear();
         //const points = mouse_points.map((val, index) => val || this.points[index]);
@@ -38,6 +54,23 @@ export class Wall extends PIXI.Graphics {
         this.moveToPoint(board, this.drawPosition[0], this.drawPosition[1]);
         this.lineTo(newPos[0], newPos[1]);
         this.stroke({ width: this.lineWidth, color: this.lineColor });
+    }
+
+    drawTemporaryRoom(board: Board, x: number, y: number) {
+        this.clear();
+        let newPos : number[] = this.snapToPoint(board, x, y);
+        this.moveToPoint(board, this.drawPosition[0], this.drawPosition[1]);
+        this.fill(0xC8BCAC);
+        this.stroke({ width: this.lineTempWidth, color: this.lineTempColor });
+        this.rect(this.drawPosition[0], this.drawPosition[1], newPos[0] - this.drawPosition[0], newPos[1] - this.drawPosition[1]);
+    }
+
+    drawPermanentRoom(board: Board, x: number, y: number) {
+        this.clear();
+        this.moveToPoint(board, this.drawPosition[0], this.drawPosition[1]);
+        this.fill(0xDCD4CA);
+        this.stroke({ width: this.lineWidth, color: this.lineColor });
+        this.rect(this.drawPosition[0], this.drawPosition[1], x - this.drawPosition[0], y - this.drawPosition[1]);
     }
 
     snapToPoint(board:Board, x: number, y:number): number[] {

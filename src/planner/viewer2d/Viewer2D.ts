@@ -11,6 +11,7 @@ export class Viewer2D extends PIXI.Application {
     backgroundLayer = new PIXI.Container();
     wallsLayer = new PIXI.Container();
     isMouseDown: boolean = false;
+    drawMode: string = 'wall';
     get canvas(): HTMLCanvasElement {
         return super.canvas;
     }
@@ -31,23 +32,24 @@ export class Viewer2D extends PIXI.Application {
        this.isMouseDown = false;
        this.stage.on('mousedown',  (e) => {
             this.wall = new Wall();
+            this.wall.drawMode = this.drawMode;
             this.wallsLayer.addChild(this.wall);
             this.wall.moveToPoint(this.board, e.data.global.x, e.data.global.y);
-            this.wall.drawTemporaryWall(this.board, e.data.global.x, e.data.global.y);
+            this.wall.drawTemporary(this.board, e.data.global.x, e.data.global.y);
             console.log('Mouse clicked: ' + this.wall.drawPosition);
             this.isMouseDown = true;
         });
         this.stage.on('mousemove', (e) => {
             
             if(this.isMouseDown) {
-                this.wall.drawTemporaryWall(this.board, e.data.global.x, e.data.global.y);
+                this.wall.drawTemporary(this.board, e.data.global.x, e.data.global.y);
                 console.log('Mouse moved' + this.wall.drawPosition);
             }
         });
         this.stage.on('mouseup', (e) => {
             console.log('Mouse released');
             this.isMouseDown = false;
-            this.wall.drawPermanentWall(this.board, e.data.global.x, e.data.global.y);
+            this.wall.drawPermanent(this.board, e.data.global.x, e.data.global.y);
             this.model.addToWalls(this.wall.drawPosition[0], this.wall.drawPosition[1], e.data.global.x, e.data.global.y)
             // console.log('X', e.data.global.x, 'Y', e.data.global.y);
         });
@@ -60,6 +62,12 @@ export class Viewer2D extends PIXI.Application {
        
       
    // }
+    setDrawMode(mode: string) {
+        this.drawMode = mode;
+    }
+    getDrawMode(): string {
+        return this.wall.drawMode;
+    }
 
     toJSON(): string{
         return this.model.toJSON();
