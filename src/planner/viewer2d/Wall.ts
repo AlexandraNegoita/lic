@@ -30,11 +30,11 @@ export class Wall extends PIXI.Graphics {
             this.drawTemporaryRoom(board, x, y);
         }
     }
-    drawPermanent(board: Board, x: number, y: number) {
+    drawPermanent(model: Model, board: Board, x: number, y: number) {
         if(this.drawMode == 'wall') {
-            this.drawPermanentWall(board, x, y);
+            this.drawPermanentWall(model, board, x, y);
         } else {
-            this.drawPermanentRoom(board, x, y);
+            this.drawPermanentRoom(model, board, x, y);
         }
     }
  
@@ -47,13 +47,14 @@ export class Wall extends PIXI.Graphics {
         this.lineTo(newPos[0], newPos[1]);
         this.stroke({ width: this.lineTempWidth, color: this.lineTempColor });
     }
-    drawPermanentWall(board:Board, x: number, y: number) {
+    drawPermanentWall(model: Model, board:Board, x: number, y: number) {
         this.clear();
         let newPos : number[] = this.snapToPoint(board, x, y);
         //console.log(x, y, newPos[0], newPos[1], this.drawPosition[0], this.drawPosition[1]);
         this.moveToPoint(board, this.drawPosition[0], this.drawPosition[1]);
         this.lineTo(newPos[0], newPos[1]);
         this.stroke({ width: this.lineWidth, color: this.lineColor });
+        this.export(model, this.drawPosition[0], this.drawPosition[1], newPos[0], newPos[1], 30);
     }
 
     drawTemporaryRoom(board: Board, x: number, y: number) {
@@ -65,12 +66,14 @@ export class Wall extends PIXI.Graphics {
         this.rect(this.drawPosition[0], this.drawPosition[1], newPos[0] - this.drawPosition[0], newPos[1] - this.drawPosition[1]);
     }
 
-    drawPermanentRoom(board: Board, x: number, y: number) {
+    drawPermanentRoom(model: Model, board: Board, x: number, y: number) {
         this.clear();
+        let newPos : number[] = this.snapToPoint(board, x, y);
         this.moveToPoint(board, this.drawPosition[0], this.drawPosition[1]);
         this.fill(0xDCD4CA);
         this.stroke({ width: this.lineWidth, color: this.lineColor });
-        this.rect(this.drawPosition[0], this.drawPosition[1], x - this.drawPosition[0], y - this.drawPosition[1]);
+        this.rect(this.drawPosition[0], this.drawPosition[1], newPos[0] - this.drawPosition[0], newPos[1] - this.drawPosition[1]);
+        this.export(model, this.drawPosition[0], this.drawPosition[1], newPos[0], newPos[1], 30);
     }
 
     snapToPoint(board:Board, x: number, y:number): number[] {
@@ -90,4 +93,17 @@ export class Wall extends PIXI.Graphics {
         return positions;
     }
 
+    export(model: Model, startPointX: number, startPointY: number, endPointX: number, endPointY: number, wallHeight: number){
+        if(this.drawMode == 'wall') {
+            if(startPointX > endPointX) [startPointX, endPointX] = [endPointX, startPointX];
+            if(startPointY > endPointY) [startPointY, endPointY] = [endPointY, startPointY];
+            model.addToWalls(startPointX, startPointY, endPointX, endPointY, wallHeight);
+        } else {
+            let wallN = model.addToWalls(startPointX, startPointY, endPointX, startPointY, wallHeight);
+            let wallS = model.addToWalls(startPointX, endPointY, endPointX, endPointY, wallHeight);
+            let wallE = model.addToWalls(endPointX, startPointY, endPointX, endPointY, wallHeight);
+            let wallW = model.addToWalls(startPointX, startPointY, startPointX, endPointY, wallHeight);
+            model.addToRooms([wallN, wallS, wallE, wallW]);
+        }
+    }
 }

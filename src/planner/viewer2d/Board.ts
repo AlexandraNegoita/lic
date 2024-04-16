@@ -2,6 +2,8 @@ import * as PIXI from "pixi.js";
 import { Coordinates } from './Coordinates';
 export class Board extends PIXI.Graphics {
     points: Coordinates[] = [];
+    lines: number = 0;
+    cols: number = 0;
     constructor (geometry?: PIXI.GraphicsContext) {
         super(geometry);
     }
@@ -30,6 +32,5 @@ export class Board extends PIXI.Graphics {
                 backgroundLayer.addChild(point);
             }
         }
-        console.log(this.points);
     }
 }

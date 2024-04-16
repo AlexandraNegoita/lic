@@ -49,8 +49,7 @@ export class Viewer2D extends PIXI.Application {
         this.stage.on('mouseup', (e) => {
             console.log('Mouse released');
             this.isMouseDown = false;
-            this.wall.drawPermanent(this.board, e.data.global.x, e.data.global.y);
-            this.model.addToWalls(this.wall.drawPosition[0], this.wall.drawPosition[1], e.data.global.x, e.data.global.y)
+            this.wall.drawPermanent(this.model,this.board, e.data.global.x, e.data.global.y);
             // console.log('X', e.data.global.x, 'Y', e.data.global.y);
         });
         //this.ticker.add(delta=>this.update(delta));
@@ -67,6 +66,14 @@ export class Viewer2D extends PIXI.Application {
     }
     getDrawMode(): string {
         return this.wall.drawMode;
+    }
+
+    getModel() : Model{
+        return this.model;
+    }
+
+    getBoard() : Board { 
+        return this.board;
     }
 
     toJSON(): string{
