@@ -16,6 +16,15 @@ export class TextureManager {
         wallNRM: string,
         wallHGT: string
     } } = {};
+    windowTexturePath: {
+        winCOL: string,
+        winNRM: string,
+        winHGT: string
+     } = {
+         winCOL: '',
+         winNRM: '',
+         winHGT: ''
+     };
     groundTexturePath: {
         groundCOL: string,
         groundNRM: string
@@ -32,6 +41,15 @@ export class TextureManager {
         wallNRM: THREE.Texture,
         wallHGT: THREE.Texture
     } } = {};
+    windowTextureLoaded: {
+        winCOL: THREE.Texture,
+        winNRM: THREE.Texture,
+        winHGT: THREE.Texture
+    } = {
+        winCOL: new THREE.Texture,
+        winNRM: new THREE.Texture,
+        winHGT: new THREE.Texture
+    };
 
     groundTextureLoaded: {
         groundCOL: THREE.Texture,
@@ -67,6 +85,19 @@ export class TextureManager {
             wallCOL: new THREE.Texture,
             wallNRM: new THREE.Texture,
             wallHGT: new THREE.Texture
+        }
+    }
+
+    createWindowTexture(id: number) {
+        this.windowTexturePath = {
+            winCOL: '',
+            winNRM: '',
+            winHGT: ''
+        };
+        this.windowTextureLoaded = {
+            winCOL: new THREE.Texture,
+            winNRM: new THREE.Texture,
+            winHGT: new THREE.Texture
         }
     }
 
@@ -141,6 +172,54 @@ export class TextureManager {
                     wallCOL: this.wallTextureLoaded[id]?this.wallTextureLoaded[id].wallCOL:new THREE.Texture,
                     wallNRM: this.wallTextureLoaded[id]?this.wallTextureLoaded[id].wallNRM:new THREE.Texture,
                     wallHGT: texture
+                }
+                break;
+            }
+        }
+        
+    }
+
+    addWindowTexture(id: string, type: string, path: string, texture: THREE.Texture) {
+        switch(type) {
+            case "COL": {
+                this.windowTexturePath = {
+                    winCOL: path,
+                    winNRM: this.windowTexturePath?this.windowTexturePath.winNRM:"",
+                    winHGT: this.windowTexturePath?this.windowTexturePath.winHGT:""
+                };
+        
+                this.windowTextureLoaded = {
+                    winCOL: texture,
+                    winNRM: this.windowTextureLoaded?this.windowTextureLoaded.winNRM:new THREE.Texture,
+                    winHGT: this.windowTextureLoaded?this.windowTextureLoaded.winHGT:new THREE.Texture
+                }
+                break;
+            }
+            case "NRM": {
+                this.windowTexturePath = {
+                    winCOL: this.windowTexturePath?this.windowTexturePath.winCOL:"",
+                    winNRM: path,
+                    winHGT: this.windowTexturePath?this.windowTexturePath.winHGT:""
+                };
+        
+                this.windowTextureLoaded = {
+                    winCOL: this.windowTextureLoaded?this.windowTextureLoaded.winCOL:new THREE.Texture,
+                    winNRM: texture,
+                    winHGT: this.windowTextureLoaded?this.windowTextureLoaded.winHGT:new THREE.Texture
+                }
+                break;
+            }
+            case "HGT":{
+                this.windowTexturePath = {
+                    winCOL: this.windowTexturePath?this.windowTexturePath.winCOL:"",
+                    winNRM: this.windowTexturePath?this.windowTexturePath.winNRM:"",
+                    winHGT: path
+                };
+        
+                this.windowTextureLoaded = {
+                    winCOL: this.windowTextureLoaded?this.windowTextureLoaded.winCOL:new THREE.Texture,
+                    winNRM: this.windowTextureLoaded?this.windowTextureLoaded.winNRM:new THREE.Texture,
+                    winHGT: texture
                 }
                 break;
             }

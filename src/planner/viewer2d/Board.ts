@@ -20,14 +20,14 @@ export class Board extends PIXI.Graphics {
         let bg = new PIXI.Sprite(PIXI.Texture.WHITE);
         bg.width = app.screen.width;
         bg.height = app.screen.height;
-        bg.tint = 0xFAEBD7;
+        bg.tint = 0xE0FFFF;
         backgroundLayer.addChild(bg);
         app.renderer.events.cursorStyles.default = 'crosshair';
         for (let i = 0; i < app.screen.width; i+=30) {
             for(let j = 0; j < app.screen.height; j+=30){
                 let point = new PIXI.Graphics()
                     .circle(i, j, 1)
-                    .fill('black');
+                    .fill(0x4682B4);
                 this.points.push(new Coordinates(i, j));
                 backgroundLayer.addChild(point);
             }

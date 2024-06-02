@@ -11,12 +11,15 @@ import { TextureManager } from "./TextureManager";
 export class Viewer3D {
     model: Model;
     renderer: Renderer;
+    walls: any;
     controls: OrbitControls | undefined;
     houseCenter: THREE.Vector3 | undefined;
     ground: Ground = new Ground();
     board: Board;
     textures: TextureManager;
     pmremGenerator: THREE.PMREMGenerator;
+    loadingManager: THREE.LoadingManager = new THREE.LoadingManager();
+    light: THREE.AmbientLight = new THREE.AmbientLight;
    
     
     constructor(model: Model, board: Board, textures: TextureManager) {
@@ -30,11 +33,11 @@ export class Viewer3D {
 
     getTextures(textureArray: {id: string, for: string, path : string, type: string}[]) {
         const allPromises: Promise<{id: string, for: string, path : string, type: string, texture: THREE.Texture}>[] = [];
-        textureArray.forEach( function( jsonMat ) {
+        textureArray.forEach( ( jsonMat ) => {
 
-            allPromises.push( new Promise( function( resolve, reject ) {
+            allPromises.push( new Promise( ( resolve, reject ) => {
         
-                new THREE.TextureLoader().load(
+                new THREE.TextureLoader(this.loadingManager).load(
                    jsonMat.path, 
         
                    function( texture ) {
@@ -80,9 +83,21 @@ export class Viewer3D {
         return allPromises;
     }
 
+    setupLoading(htmlElement: HTMLElement) {
+        this.loadingManager = new THREE.LoadingManager( () => {
+	
+            let loadingScreen = htmlElement;
+            loadingScreen.classList.add( 'fade-out' );
+            
+            // // optional: remove loader from DOM via event listener
+            // loadingScreen?.addEventListener( 'transitionend', onTransitionEnd );
+            
+        } );
+    }
 
-    setup(fov: number, width: number, height: number, near: number, far: number) {
-        const hdriLoader = new RGBELoader()
+    setup(fov: number, width: number, height: number, near: number, far: number, htmlElement: HTMLElement) {
+        this.setupLoading(htmlElement);
+        const hdriLoader = new RGBELoader(this.loadingManager);
         hdriLoader.load( this.textures.HDRIPath,  ( hdrMap ) => {
             hdrMap.mapping = THREE.EquirectangularReflectionMapping;
 
@@ -99,6 +114,9 @@ export class Viewer3D {
                         } else if(texture.for == "WALL") {
                             //console.log(texture.id, texture.type, texture.path, texture.texture);
                             this.textures.addWallTexture(texture.id, texture.type, texture.path, texture.texture);
+                        } else if(texture.for == "WINDOW") {
+                            //console.log(texture.id, texture.type, texture.path, texture.texture);
+                            this.textures.addWindowTexture(texture.id, texture.type, texture.path, texture.texture);
                         }
                     });
                     this.renderer.setup(fov, width, height, near, far);
@@ -122,17 +140,24 @@ export class Viewer3D {
     }
 
     setupLighting() {
-        let dl = new THREE.AmbientLight(0xFFFFFF, 0.7);
-       // let dlHelper = new THREE.DirectionalLightHelper(dl, 3);
-        if(this.houseCenter) {
-            dl.position.set(this.houseCenter.x, this.houseCenter.y + 5, this.houseCenter.z);
+        if(!this.renderer.scene.children.includes(this.light)) {
+            this.light = new THREE.AmbientLight(0xFFFFFF, 1);
+            if(this.houseCenter) {
+                this.light.position.set(this.houseCenter.x, this.houseCenter.y + 5, this.houseCenter.z);
+            }
+            this.renderer.scene.add(this.light);
         }
-        this.renderer.scene.add(dl);
+       
     }
 
     run() {
+
         this.renderer.houseGroup.add(this.ground.buildGround(this.board, this.textures));
-        this.renderer.build3DModel();
+        // this.walls = 
+        //this.renderer.build3DModel();
+        // this.renderer.scene.add(this.walls);
+        
+        this.renderer.renderModel();
         this.renderer.getRenderer().setAnimationLoop(this.animate);
         
         this.setupCamera();
@@ -140,7 +165,9 @@ export class Viewer3D {
     }
 
     stop() {
-        this.renderer.clear();
+       // this.renderer.clear();
+        this.renderer.refresh();
+       // this.renderer.scene.remove(this.walls);
         this.renderer.getRenderer().setAnimationLoop(null);
     }
 

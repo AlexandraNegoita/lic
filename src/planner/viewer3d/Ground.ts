@@ -21,6 +21,7 @@ export class Ground {
         ground.rotateX(-Math.PI / 2);
         ground.translateX(-0.5);
         ground.translateY(-0.5);
+        //ground.translateZ(9);
         
         return ground;
     }
