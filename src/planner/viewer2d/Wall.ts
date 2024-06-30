@@ -126,6 +126,7 @@ export class Wall extends PIXI.Graphics {
         this.startPosition = this.drawPosition;
         this.stroke({ width: this.lineWidth, color: this.lineColor });
         let id = this.model.checkClosedPolygon(this.export(this.drawPosition[0], this.drawPosition[1], newPos[0], newPos[1], 100));
+        //let id = this.model.initiateRoomDetection();
         // let ID = this.model.findWallByID(this.wallID)?.wall.roomID;
         if(id != -1) this.partOfRoomID.push(id);// else this.partOfRoomID = -1;
         console.log("ID: " + this.wallID + " : " + id);
@@ -212,6 +213,7 @@ export class Wall extends PIXI.Graphics {
            
         }
     }
+
     drawTemporaryGripPoint(x: number, y: number) {
         this.circle(x, y, 7);
         this.fill(0xC8BCAC);        

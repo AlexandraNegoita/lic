@@ -1,4 +1,46 @@
 
+#optionsMenu {
+    position: fixed;
+    background-color: rgb(30, 53, 78);
+    /* color: #fff; */
+	overflow-y:auto;
+	overflow-x: hidden;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 25vw;
+    padding: 0;
+    margin: 0;
+    transition: 0.3s;
+    transform: translateX(-60%);
+	z-index: 5!important;
+  }
+  
+  #optionsMenu.is-active {
+    transform: translateX(0%);
+  }
+  
+  #optionsMenu.is-active li {
+    animation: animate 350ms ease calc(var(--i) * 100ms) both;
+  }
+  
+  .align-right {
+	display: flex;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+}
+.photo-wrapper {
+	flex: 0 0 33.3333%; /* Each photo takes up 1/3rd of the row */
+	max-width: 33.3333%;
+	padding: 5px;
+}
+.photo {
+	width: 100%; /* Ensure the image takes up the full width of its container */
+	height: auto; /* Maintain aspect ratio */
+}
+.container {
+	overflow: hidden!important; /* Prevent overflow */
+}
 
 #configurationMenu {
     position: fixed;
@@ -13,7 +55,7 @@
     margin: 0;
     transition: 0.3s;
     transform: translateX(-60%);
-	
+	z-index: 10;
   }
   
   #configurationMenu.is-active {
@@ -226,7 +268,7 @@ input:not(:active) + #h4-container h4 {
 	pointer-events: none;
 }
 
-#editMenu {
+#editMenu, #materialMenu {
 	display: none;
 	/* //transition: margin-top 0.15s ease-in-out, opacity 0.15s ease-in-out; */
 	align-items: center;
@@ -234,40 +276,88 @@ input:not(:active) + #h4-container h4 {
 	margin: 2vh;
 }
 
-#editMenu .confButton {
+#editMenu .confButton, #materialMenu .confButton {
 	margin: 2vh;
+}
+
+#openMenu {
+  width: 40vh;
+  height:40vh;
+  border-radius: 50%;
+  border:1px solid #4679BD; 
+  overflow:hidden;
+  /* position: absolute; */
+  position: absolute;
+  display: block;
+  top: -20vh;
+  left: 0vh;
+  background: #4679BD; 
+  /* //box-shadow: 0 0 3px gray; */
+  transition: 0.4s;
+  }
+  #openMenu:hover {
+  background:#4679BD;
+  border:15px solid #cfdcec;
+  }
+  #openMenu button {
+  display:block;
+  float:left;
+  line-height:1em;
+      
+  text-align:center;
+  color:#e2eaf3;
+  font-family:Verdana;
+  font-size:1.2em;
+  font-weight:bold;
+  text-decoration:none;
+}
+
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 
 
-  #openMenu {
-	width: 40vh;
-	height:40vh;
-	border-radius: 50%;
-	border:1px solid #4679BD; 
-	overflow:hidden;
-	/* position: absolute; */
-	position: absolute;
-	display: block;
-	top: -20vh;
-	left: 0vh;
-	background: #4679BD; 
-	/* //box-shadow: 0 0 3px gray; */
-	transition: 0.4s;
-  }
-  #openMenu:hover {
-	background:#4679BD;
-	border:15px solid #cfdcec;
-  }
-  #openMenu button {
-	display:block;
-	float:left;
-	line-height:1em;
-		  
-	text-align:center;
-	color:#e2eaf3;
-	font-family:Verdana;
-	font-size:1.2em;
-	font-weight:bold;
-	text-decoration:none;
-  }
+input[type="file"]::file-selector-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

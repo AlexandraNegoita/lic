@@ -3,6 +3,7 @@ import { Model } from '../model/Model';
 import { TextureManager } from './TextureManager';
 
 export class Renderer {
+    showRoof: boolean = false;
     scene: THREE.Scene =  new THREE.Scene();
     camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera;
     renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer();
@@ -11,6 +12,7 @@ export class Renderer {
     model: Model;
     houseGroup = new THREE.Group();
     house = new THREE.Object3D();
+    roof = new THREE.Object3D();
     textures : TextureManager;
 
   
@@ -23,7 +25,7 @@ export class Renderer {
         this.setupCamera(fov, width, height, near, far)
         this.renderer.setSize( width, height);
         
-        this.house.rotateX(-Math.PI / 2);
+         this.house.rotateX(-Math.PI / 2);
         
         this.renderModel();
         
@@ -62,6 +64,22 @@ export class Renderer {
             this.house.remove(wall);
         }
     }
+    
+    toggleShowRoof(showRoof: boolean){
+        console.log(showRoof);
+        if(this.model.roof.length > 0) {
+            let roof = this.buildRoof();
+            if(roof) {
+                if(showRoof == true) {
+                    this.house.add(roof);
+                } else {
+                    this.house.remove(roof);
+                }
+            }
+            
+        }
+
+    }
 
     renderModel() {
         //const renderModel :  Renderer = new Renderer(model);
@@ -91,26 +109,64 @@ export class Renderer {
         //this.house.position.copy(new THREE.Vector3(0, 0, 0));
     }
 
-    setupWallMaterial(texture: THREE.Texture, normalTexture: THREE.Texture, heightTexture: THREE.Texture): THREE.MeshPhongMaterial {
+    setupWallMaterial(width: number, texture: THREE.Texture, normalTexture: THREE.Texture, heightTexture: THREE.Texture): THREE.MeshPhongMaterial {
         // const textureLoaded = new THREE.TextureLoader().load(texture);
         // const normalTextureLoaded = new THREE.TextureLoader().load(normalTexture);
         texture.wrapS = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set( 2,  2);
+       // texture.repeat.set( 1,  1);
         normalTexture.wrapS = THREE.RepeatWrapping;
         normalTexture.wrapT = THREE.RepeatWrapping;
-        normalTexture.repeat.set( 2, 2 );
+        //normalTexture.repeat.set( 1, 1 );
         heightTexture.wrapS = THREE.RepeatWrapping;
         heightTexture.wrapT = THREE.RepeatWrapping;
-        heightTexture.repeat.set( 2, 2 );
+
+        texture.repeat.set(width / 4, 1);
+        normalTexture.repeat.set(width / 4, 1);
+        heightTexture.repeat.set(width / 4, 1);
+        texture.needsUpdate = true;
+        normalTexture.needsUpdate = true;
+        heightTexture.needsUpdate = true;
+
         return new THREE.MeshPhongMaterial({ 
             map: texture,
             normalMap: normalTexture,
-            normalScale: new THREE.Vector2(2,2),
+            // normalScale: new THREE.Vector2(4,4),
             displacementMap: heightTexture,
             displacementScale: 0,
             envMap: this.textures.envMap,
             reflectivity: 0.5,
+        })
+    }
+
+    setupRoofMaterial(width: number, texture: THREE.Texture, normalTexture: THREE.Texture, heightTexture: THREE.Texture): THREE.MeshPhongMaterial {
+        // const textureLoaded = new THREE.TextureLoader().load(texture);
+        // const normalTextureLoaded = new THREE.TextureLoader().load(normalTexture);
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+       // texture.repeat.set( 1,  1);
+        normalTexture.wrapS = THREE.RepeatWrapping;
+        normalTexture.wrapT = THREE.RepeatWrapping;
+        //normalTexture.repeat.set( 1, 1 );
+        heightTexture.wrapS = THREE.RepeatWrapping;
+        heightTexture.wrapT = THREE.RepeatWrapping;
+        
+        texture.repeat.set(width/16, 1);
+        normalTexture.repeat.set(width/16, 1);
+        heightTexture.repeat.set(width/16, 1);
+        texture.needsUpdate = true;
+        normalTexture.needsUpdate = true;
+        heightTexture.needsUpdate = true;
+
+        return new THREE.MeshPhongMaterial({ 
+            map: texture,
+            normalMap: normalTexture,
+            // normalScale: new THREE.Vector2(4,4),
+            displacementMap: heightTexture,
+            displacementScale: 0,
+            envMap: this.textures.envMap,
+            reflectivity: 0.5,
+            side: THREE.DoubleSide
         })
     }
 
@@ -174,14 +230,14 @@ export class Renderer {
         var angle = Math.atan2(wall1X * wall2Y - wall1Y * wall2X, wall1X * wall2X + wall1Y * wall2Y);
        // if(angle < 0) {angle = angle * -1;}
         var degree_angle = 180 - angle * (180 / Math.PI);
-        console.log("angle: " + degree_angle)
+        //console.log("angle: " + degree_angle)
         return angle;
         //if(degree_angle > 90) return false;
         //return true;
     }
 
 
-    buildDoors(wallID: number, width: number, height: number, thickness: number, orientation: string) {
+    buildDoors(wallID: number, width: number, height: number, thickness: number, orientation: string, angle: number) {
         //     let wallShape = new THREE.Shape();
         //     wallShape.moveTo(-width, height);
         //     wallShape.lineTo(-width, -height);
@@ -189,7 +245,7 @@ export class Renderer {
         //     wallShape.lineTo(width, height);
         //     wallShape.lineTo(-width, height);
             this.model.objects.doors.forEach(doorData => {
-                console.log(doorData.door.partOfWall + " >> " + wallID)
+                //console.log(doorData.door.partOfWall + " >> " + wallID)
                 if(doorData.door.partOfWall == wallID){
                     
                    
@@ -220,7 +276,8 @@ export class Renderer {
                     });
                     doorGeometry.translate(-local1.x, -local1.y, -(thickness*1.5) / 2);
                     doorGeometry.rotateX(Math.PI / 2);
-                    if(orientation == 'vertical') doorGeometry.rotateZ(Math.PI / 2);
+                    if(orientation == 'vertical') doorGeometry.rotateZ(Math.PI/2);
+                    else if(orientation == 'diagonal') doorGeometry.rotateZ(angle);
                     doorGeometry.translate(local1.x, local1.y, height * 0.4);
                     let door = new THREE.Mesh(doorGeometry, this.setupWindowFrameMaterial(
                         this.textures.windowTextureLoaded.winCOL,
@@ -251,7 +308,8 @@ export class Renderer {
                     });
                     doorFrameGeometry.translate(-local1.x, -local1.y, -thickness / 2);
                     doorFrameGeometry.rotateX(Math.PI / 2);
-                    if(orientation == 'vertical') doorFrameGeometry.rotateZ(Math.PI / 2);
+                    if(orientation == 'vertical') doorFrameGeometry.rotateZ(Math.PI/2);
+                    else if(orientation == 'diagonal') doorFrameGeometry.rotateZ(angle);
                     doorFrameGeometry.translate(local1.x, local1.y, height * 0.4);
                     let doorFrame = new THREE.Mesh(doorFrameGeometry, this.setupWindowFrameMaterial(
                         this.textures.windowTextureLoaded.winCOL,
@@ -266,7 +324,7 @@ export class Renderer {
         }
 
 
-    buildWindows(wallID: number, width: number, height: number, thickness: number, orientation: string) {
+    buildWindows(wallID: number, width: number, height: number, thickness: number, orientation: string, angle : number) {
     //     let wallShape = new THREE.Shape();
     //     wallShape.moveTo(-width, height);
     //     wallShape.lineTo(-width, -height);
@@ -274,7 +332,7 @@ export class Renderer {
     //     wallShape.lineTo(width, height);
     //     wallShape.lineTo(-width, height);
         this.model.objects.windows.forEach(windowData => {
-            console.log(windowData.window.partOfWall + " >> " + wallID)
+           // console.log(windowData.window.partOfWall + " >> " + wallID)
             if(windowData.window.partOfWall == wallID){
                 
                
@@ -305,7 +363,8 @@ export class Renderer {
                 });
                 windowGeometry.translate(-local1.x, -local1.y, -(thickness*1.5) / 2);
                 windowGeometry.rotateX(Math.PI / 2);
-                if(orientation == 'vertical') windowGeometry.rotateZ(Math.PI / 2);
+                if(orientation == 'vertical') windowGeometry.rotateZ(Math.PI/2);
+                    else if(orientation == 'diagonal') windowGeometry.rotateZ(angle);
                 windowGeometry.translate(local1.x, local1.y, (thickness*1.5) + height * 0.3);
                 let window = new THREE.Mesh(windowGeometry, this.setupWindowMaterial(
                     this.textures.windowTextureLoaded.winCOL,
@@ -337,7 +396,8 @@ export class Renderer {
                 });
                 windowFrameGeometry.translate(-local1.x, -local1.y, -thickness / 2);
                 windowFrameGeometry.rotateX(Math.PI / 2);
-                if(orientation == 'vertical') windowFrameGeometry.rotateZ(Math.PI / 2);
+                if(orientation == 'vertical') windowFrameGeometry.rotateZ(Math.PI/2);
+                else if(orientation == 'diagonal') windowFrameGeometry.rotateZ(angle);
                 windowFrameGeometry.translate(local1.x, local1.y, (thickness*1.5) + height * 0.3);
                 let windowFrame = new THREE.Mesh(windowFrameGeometry, this.setupWindowFrameMaterial(
                     this.textures.windowTextureLoaded.winCOL,
@@ -351,20 +411,136 @@ export class Renderer {
         });
     }
 
+    buildFloor() {
+        this.model.rooms.forEach(roomData => {
+            let floorShape = new THREE.Shape();
+            roomData.room.wallsID.forEach(wallID => {
+                let wall = this.model.findWallByID(wallID);
+             //   console.log("nu gaseseste wall");
+                if(wall) {
+                   // console.log(this.calculateRatio(wall.wall.startPoint.coordX - 0.5), this.calculateRatio(wall.wall.startPoint.coordY - 0.5))
+                    floorShape.moveTo(this.calculateRatio(wall.wall.startPoint.coordX - 0.5), this.calculateRatio(wall.wall.startPoint.coordY - 0.5));
+                    floorShape.lineTo(this.calculateRatio(wall.wall.endPoint.coordX - 0.5), this.calculateRatio(wall.wall.endPoint.coordY - 0.5));
+                }
+            });
+            let floorGeometry = new THREE.ExtrudeGeometry(floorShape, {
+                        steps: 200,
+                        depth: 0.2,
+                        bevelEnabled: false,
+                    }, );
+
+            let floor = new THREE.Mesh(floorGeometry, this.setupWindowFrameMaterial(
+                this.textures.windowTextureLoaded.winCOL,
+                this.textures.windowTextureLoaded.winNRM,
+                this.textures.windowTextureLoaded.winHGT
+            )  
+            );
+            this.house.add(floor);
+        })
+    }
+
+    buildRoof() {
+        const vertices = [];
+        const indices = [];
+        let perimeter = this.model.roof;
+        if(perimeter) {
+           // console.log(perimeter);
+            // Extract unique perimeter points from walls
+            const perimeterPoints: { x: number, y: number; }[] = [];
+            const uniquePoints = new Set();
+            perimeter.forEach(wall => {
+                const startPointKey = `${wall.wall.startPoint.coordX},${wall.wall.startPoint.coordY}`;
+                const endPointKey = `${wall.wall.endPoint.coordX},${wall.wall.endPoint.coordY}`;
+                if (!uniquePoints.has(startPointKey)) {
+                    perimeterPoints.push({ x: this.calculateRatio(wall.wall.startPoint.coordX), y: this.calculateRatio(wall.wall.startPoint.coordY) });
+                    uniquePoints.add(startPointKey);
+                }
+                if (!uniquePoints.has(endPointKey)) {
+                    perimeterPoints.push({ x: this.calculateRatio(wall.wall.endPoint.coordX), y: this.calculateRatio(wall.wall.endPoint.coordY) });
+                    uniquePoints.add(endPointKey);
+                }
+            });
+        
+            // Compute center point for the hip roof
+            const centerX = perimeterPoints.reduce((sum, p) => sum + p.x, 0) / perimeterPoints.length;
+            const centerY = perimeterPoints.reduce((sum, p) => sum + p.y, 0) / perimeterPoints.length;
+        
+            // Add vertices for the base and the top
+            for (let i = 0; i < perimeterPoints.length; i++) {
+                vertices.push(perimeterPoints[i].x, perimeterPoints[i].y, this.calculateRatio(perimeter[0].wall.wallHeight)); // base vertex
+                vertices.push(perimeterPoints[i].x, perimeterPoints[i].y, this.calculateRatio(perimeter[0].wall.wallHeight)); // top vertex
+            }
+            vertices.push(centerX, centerY, this.calculateRatio(perimeter[0].wall.wallHeight + 120)); // center top vertex
+        
+            const topIndex = perimeterPoints.length * 2;
+        
+            // Create faces for the hip roof sides
+            for (let i = 0; i < perimeterPoints.length; i++) {
+                const nextIndex = (i + 1) % perimeterPoints.length;
+                // Base to top center
+                indices.push(i * 2, nextIndex * 2, topIndex);
+                // Top vertices to top center
+                indices.push(nextIndex * 2 + 1, i * 2 + 1, topIndex);
+            }
+        
+            // Create BufferGeometry and set attributes
+            const geometry = new THREE.BufferGeometry();
+            const verticesFloat32Array = new Float32Array(vertices);
+            
+             // Compute bounding box
+            const minX = Math.min(...perimeterPoints.map(p => p.x));
+            const maxX = Math.max(...perimeterPoints.map(p => p.x));
+            const minY = Math.min(...perimeterPoints.map(p => p.y));
+            const maxY = Math.max(...perimeterPoints.map(p => p.y));
+             // Create UVs
+            const uvs = [];
+            for (let i = 0; i < perimeterPoints.length; i++) {
+                // Normalize the perimeter points to [0, 1] range based on bounding box
+                const u = (perimeterPoints[i].x - minX) / (maxX - minX);
+                const v = (perimeterPoints[i].y - minY) / (maxY - minY);
+                uvs.push(u, v); // base vertex
+                uvs.push(u, v); // top vertex
+            }
+            // Center top vertex UV (approximated as center of UV space)
+            uvs.push(0.5, 0.5);
+            const uvsFloat32Array = new Float32Array(uvs);
+            geometry.setAttribute('position', new THREE.BufferAttribute(verticesFloat32Array, 3));
+            geometry.setAttribute('uv', new THREE.BufferAttribute(uvsFloat32Array, 2));
+
+            const indicesUint32Array = new Uint32Array(indices);
+            geometry.setIndex(new THREE.BufferAttribute(indicesUint32Array, 1));
+            geometry.computeVertexNormals();
+        
+            // Create the roof mesh
+            const material = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
+            return new THREE.Mesh(geometry, this.setupRoofMaterial(
+                centerX*2,
+                this.textures.roofTextureLoaded[this.textures.roofTextureSelected].roofCOL.clone(),
+                this.textures.roofTextureLoaded[this.textures.roofTextureSelected].roofNRM.clone(),
+                this.textures.roofTextureLoaded[this.textures.roofTextureSelected].roofHGT.clone()
+            ),);
+            // this.house.add(roof);
+        }
+        
+    }
+
     buildWalls() {
         let orientation = '';
+        let wallGeometry: THREE.BoxGeometry;
+        let angle : number = 0;
         this.model.walls.forEach(wallData => {
             const thickness = 0.5;
             //let wallShape = new THREE.Shape();
             let dist = this.model.calculateWallLengthRatio(wallData.wall.wallID);
-            let wallGeometry;
-           if(dist) wallGeometry = new THREE.BoxGeometry(dist + thickness,  thickness, this.calculateRatio(wallData.wall.wallHeight));
+            
+           if(dist) wallGeometry = new THREE.BoxGeometry(dist + thickness - 0.1,  thickness, this.calculateRatio(wallData.wall.wallHeight));
            
 
              if(wallData.wall.startPoint.coordX == wallData.wall.endPoint.coordX) {
             //     // vertical
                 orientation = 'vertical';
-                wallGeometry?.rotateZ(Math.PI / 2);
+                wallGeometry.rotateZ(Math.PI / 2);
+                angle = Math.PI/2;
                 // wallShape.moveTo(this.calculateRatio(wallData.wall.startPoint.coordX - thickness), this.calculateRatio(wallData.wall.startPoint.coordY + thickness));
                 // wallShape.lineTo(this.calculateRatio(wallData.wall.startPoint.coordX + thickness), this.calculateRatio(wallData.wall.startPoint.coordY + thickness));
                 // wallShape.lineTo(this.calculateRatio(wallData.wall.endPoint.coordX + thickness), this.calculateRatio(wallData.wall.endPoint.coordY - thickness));
@@ -396,7 +572,7 @@ export class Renderer {
             //     // diagonal
                 orientation = 'diagonal';
                 wallGeometry?.rotateZ(this.checkAngle(wallData.wall.startPoint.coordX, wallData.wall.startPoint.coordY, wallData.wall.endPoint.coordX, wallData.wall.endPoint.coordY));
-
+                angle = this.checkAngle(wallData.wall.startPoint.coordX, wallData.wall.startPoint.coordY, wallData.wall.endPoint.coordX, wallData.wall.endPoint.coordY);
             //     wallShape.moveTo(this.calculateRatio(wallData.wall.startPoint.coordX - thickness), this.calculateRatio(wallData.wall.startPoint.coordY + thickness));
             //     wallShape.lineTo(this.calculateRatio(wallData.wall.startPoint.coordX + thickness), this.calculateRatio(wallData.wall.startPoint.coordY + thickness));
             //     wallShape.lineTo(this.calculateRatio(wallData.wall.endPoint.coordX - thickness), this.calculateRatio(wallData.wall.endPoint.coordY + thickness));
@@ -423,34 +599,42 @@ export class Renderer {
             // // })
             // .catch(err => console.error(err))
             // wallGeometry.rotateOd(Math.PI / 2);
-             console.log("orientation: " + orientation)
-            let middle = this.model.calculateMiddleRatio(wallData.wall.wallID);
+            // console.log("orientation: " + orientation)
+
+
+
+
+           let middle = this.model.calculateMiddleRatio(wallData.wall.wallID);
            if(middle) wallGeometry?.translate(middle.coordX, middle.coordY, this.calculateRatio(wallData.wall.wallHeight) / 2);
-           console.log(middle?.coordX + " >>>>>> " + middle?.coordY);
-           let wall = new THREE.Mesh(wallGeometry, this.setupWallMaterial(
-                this.textures.wallTextureLoaded[this.textures.wallTextureSelected].wallCOL,
-                this.textures.wallTextureLoaded[this.textures.wallTextureSelected].wallNRM,
-                this.textures.wallTextureLoaded[this.textures.wallTextureSelected].wallHGT
-                ));
-            wall.position.z = 0;
-            // let wallGroup = new THREE.Group();
-            // wallGroup.add(wall);
-            // wallGroup.rotateX(- Math.PI / 2)
-                //wall.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), Math.PI);
+           // console.log(middle?.coordX + " >>>>>> " + middle?.coordY);
+           let wall;
+           if(wallGeometry && dist) {
+                wall = new THREE.Mesh(wallGeometry, 
+                    this.setupWallMaterial(
+                        dist + thickness,
+                        this.textures.wallTextureLoaded[this.textures.wallTextureSelected].wallCOL.clone(),
+                        this.textures.wallTextureLoaded[this.textures.wallTextureSelected].wallNRM.clone(),
+                        this.textures.wallTextureLoaded[this.textures.wallTextureSelected].wallHGT.clone()
+                    ),
+                );
 
-            // var geo = new THREE.WireframeGeometry( wall.geometry ); // or WireframeGeometry
-            // var mat = new THREE.LineBasicMaterial( { color: 0xffffff } );
-            // var wireframe = new THREE.LineSegments( geo, mat );
-            // wall.add( wireframe );
-            if( dist) this.buildWindows(wallData.wall.wallID, dist + thickness, this.calculateRatio(wallData.wall.wallHeight), thickness, orientation);
-            if( dist) this.buildDoors(wallData.wall.wallID, dist + thickness, this.calculateRatio(wallData.wall.wallHeight), thickness, orientation);
-            
-            this.house.add(wall);
-        });
-        
-        
+                wall.position.z = 0;
+                // let wallGroup = new THREE.Group();
+                // wallGroup.add(wall);
+                // wallGroup.rotateX(- Math.PI / 2)
+                    //wall.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), Math.PI);
+
+                // var geo = new THREE.WireframeGeometry( wall.geometry ); // or WireframeGeometry
+                // var mat = new THREE.LineBasicMaterial( { color: 0xffffff } );
+                // var wireframe = new THREE.LineSegments( geo, mat );
+                // wall.add( wireframe );
+                if( dist) this.buildWindows(wallData.wall.wallID, dist + thickness, this.calculateRatio(wallData.wall.wallHeight), thickness, orientation, angle);
+                if( dist) this.buildDoors(wallData.wall.wallID, dist + thickness, this.calculateRatio(wallData.wall.wallHeight), thickness, orientation, angle);
+                this.buildFloor();
+                
+                this.house.add(wall);
+           }
+          
+        });   
     }
-
-
-
 }

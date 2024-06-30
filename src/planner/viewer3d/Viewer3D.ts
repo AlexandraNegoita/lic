@@ -9,6 +9,7 @@ import { TextureManager } from "./TextureManager";
 
 
 export class Viewer3D {
+    showRoof: boolean = false;
     model: Model;
     renderer: Renderer;
     walls: any;
@@ -114,6 +115,9 @@ export class Viewer3D {
                         } else if(texture.for == "WALL") {
                             //console.log(texture.id, texture.type, texture.path, texture.texture);
                             this.textures.addWallTexture(texture.id, texture.type, texture.path, texture.texture);
+                        } else if(texture.for == "ROOF") {
+                            //console.log(texture.id, texture.type, texture.path, texture.texture);
+                            this.textures.addRoofTexture(texture.id, texture.type, texture.path, texture.texture);
                         } else if(texture.for == "WINDOW") {
                             //console.log(texture.id, texture.type, texture.path, texture.texture);
                             this.textures.addWindowTexture(texture.id, texture.type, texture.path, texture.texture);
@@ -173,6 +177,12 @@ export class Viewer3D {
 
     getRendererCanvas() : HTMLCanvasElement {
         return this.renderer.getRenderer().domElement;
+    }
+
+    setShowRoof(showRoof: boolean) {
+        this.showRoof = showRoof;
+        console.log("3d" + showRoof);
+        this.renderer.toggleShowRoof(showRoof);
     }
 
     animate() {

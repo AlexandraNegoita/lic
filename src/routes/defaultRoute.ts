@@ -12,5 +12,5 @@ export const app = Router();
 
 const __dirname = path.resolve();
 console.log(path.join(__dirname, 'build/src/pages'));
-app.use(express.static(path.join(__dirname, 'build/src/planner')));
+// app.use(express.static(path.join(__dirname, 'build/src/planner')));
 app.use(express.static(path.join(__dirname, 'build/src/pages')));

@@ -4,7 +4,7 @@ export class TextureManager {
     loader: THREE.TextureLoader = new THREE.TextureLoader();
     idWall: number = 0;
 
-    readPaths : {
+    public readPaths : {
         id: string, 
         for: string, 
         path : string, 
@@ -16,6 +16,13 @@ export class TextureManager {
         wallNRM: string,
         wallHGT: string
     } } = {};
+
+    roofTexturePath: { [id: string] : {
+        roofCOL: string,
+        roofNRM: string,
+        roofHGT: string
+    } } = {};
+
     windowTexturePath: {
         winCOL: string,
         winNRM: string,
@@ -41,6 +48,12 @@ export class TextureManager {
         wallNRM: THREE.Texture,
         wallHGT: THREE.Texture
     } } = {};
+    roofTextureLoaded: { [id: string] : {
+        roofCOL: THREE.Texture,
+        roofNRM: THREE.Texture,
+        roofHGT: THREE.Texture
+    } } = {};
+
     windowTextureLoaded: {
         winCOL: THREE.Texture,
         winNRM: THREE.Texture,
@@ -58,7 +71,8 @@ export class TextureManager {
         groundCOL: new THREE.Texture,
         groundNRM: new THREE.Texture
     };
-    wallTextureSelected: number = 1634;
+    wallTextureSelected: string = "1634";
+    roofTextureSelected:string = "4683";
 
     
     
@@ -85,6 +99,19 @@ export class TextureManager {
             wallCOL: new THREE.Texture,
             wallNRM: new THREE.Texture,
             wallHGT: new THREE.Texture
+        }
+    }
+
+    createRoofTexture(id: number) {
+        this.roofTexturePath[id] = {
+            roofCOL: '',
+            roofNRM: '',
+            roofHGT: ''
+        };
+        this.roofTextureLoaded[id] = {
+            roofCOL: new THREE.Texture,
+            roofNRM: new THREE.Texture,
+            roofHGT: new THREE.Texture
         }
     }
 
@@ -179,6 +206,54 @@ export class TextureManager {
         
     }
 
+    addRoofTexture(id: string, type: string, path: string, texture: THREE.Texture) {
+        switch(type) {
+            case "COL": {
+                this.roofTexturePath[id] = {
+                    roofCOL: path,
+                    roofNRM: this.roofTexturePath[id]?this.roofTexturePath[id].roofNRM:"",
+                    roofHGT: this.roofTexturePath[id]?this.roofTexturePath[id].roofHGT:""
+                };
+        
+                this.roofTextureLoaded[id] = {
+                    roofCOL: texture,
+                    roofNRM: this.roofTextureLoaded[id]?this.roofTextureLoaded[id].roofNRM:new THREE.Texture,
+                    roofHGT: this.roofTextureLoaded[id]?this.roofTextureLoaded[id].roofHGT:new THREE.Texture
+                }
+                break;
+            }
+            case "NRM": {
+                this.roofTexturePath[id] = {
+                    roofCOL: this.roofTexturePath[id]?this.roofTexturePath[id].roofCOL:"",
+                    roofNRM: path,
+                    roofHGT: this.roofTexturePath[id]?this.roofTexturePath[id].roofHGT:""
+                };
+        
+                this.roofTextureLoaded[id] = {
+                    roofCOL: this.roofTextureLoaded[id]?this.roofTextureLoaded[id].roofCOL:new THREE.Texture,
+                    roofNRM: texture,
+                    roofHGT: this.roofTextureLoaded[id]?this.roofTextureLoaded[id].roofHGT:new THREE.Texture
+                }
+                break;
+            }
+            case "HGT":{
+                this.roofTexturePath[id] = {
+                    roofCOL: this.roofTexturePath[id]?this.roofTexturePath[id].roofCOL:"",
+                    roofNRM: this.roofTexturePath[id]?this.roofTexturePath[id].roofNRM:"",
+                    roofHGT: path
+                };
+        
+                this.roofTextureLoaded[id] = {
+                    roofCOL: this.roofTextureLoaded[id]?this.roofTextureLoaded[id].roofCOL:new THREE.Texture,
+                    roofNRM: this.roofTextureLoaded[id]?this.roofTextureLoaded[id].roofNRM:new THREE.Texture,
+                    roofHGT: texture
+                }
+                break;
+            }
+        }
+        
+    }
+
     addWindowTexture(id: string, type: string, path: string, texture: THREE.Texture) {
         switch(type) {
             case "COL": {
@@ -231,8 +306,12 @@ export class TextureManager {
     //     return this.loader.load(texturePath, );
     // }
 
-    selectWallTexture(id: number) {
+    selectWallTexture(id: string) {
         this.wallTextureSelected = id;
+    }
+
+    selectRoofTexture(id: string) {
+        this.roofTextureSelected = id;
     }
 
 
